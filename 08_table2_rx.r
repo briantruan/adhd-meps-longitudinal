@@ -35,5 +35,5 @@ table2 <- tbl_svysummary(
   add_p() %>% 
   as_gt()
 
-gtsave(table1, "exports/table1.html")
-gtsave(table1, "exports/table1.docx")
+gtsave(table2, "exports/table2.html")
+gtsave(table2, "exports/table2.docx")
