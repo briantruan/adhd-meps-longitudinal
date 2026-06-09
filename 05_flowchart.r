@@ -81,86 +81,88 @@ n_adhd <- nrow(step4)
 n_rx <- nrow(rx)
 n_ob <- nrow(ob)
 
-flow_chart <- DiagrammeR::grViz(sprintf(
-  "
-  digraph flowchart {
-    graph [
-      layout = dot,
-      rankdir = TB,
-      bgcolor = 'white',
-      splines = ortho,
-      nodesep = 0.45,
-      ranksep = 0.6
-    ]
+# # if the flow chart ever needs an update, can uncomment
 
-    node [
-      shape = box,
-      style = 'rounded,filled',
-      fontname = Helvetica,
-      fontsize = 12,
-      margin = '0.18,0.10',
-      width = 3.5,
-      height = 0.8,
-      color = '#3B5B92',
-      fillcolor = '#F7FAFF',
-      align = center
-    ]
+# flow_chart <- DiagrammeR::grViz(sprintf(
+#   "
+#   digraph flowchart {
+#     graph [
+#       layout = dot,
+#       rankdir = TB,
+#       bgcolor = 'white',
+#       splines = ortho,
+#       nodesep = 0.45,
+#       ranksep = 0.6
+#     ]
 
-    edge [
-      color = '#6B7280',
-      penwidth = 1.2,
-      arrowsize = 0.8
-    ]
+#     node [
+#       shape = box,
+#       style = 'rounded,filled',
+#       fontname = Helvetica,
+#       fontsize = 12,
+#       margin = '0.18,0.10',
+#       width = 3.5,
+#       height = 0.8,
+#       color = '#3B5B92',
+#       fillcolor = '#F7FAFF',
+#       align = center
+#     ]
 
-    total [label = 'Total records\\nN = %s\\n']
-    age   [label = 'Age-eligible cohort (<65 years)\\nN = %s\\n']
-    med   [label = 'Non-Medicare, age-eligible cohort\\nN = %s\\n']
-    adhd  [label = 'Has ADHD diagnosis (F90.x)\\nN = %s\\n']
+#     edge [
+#       color = '#6B7280',
+#       penwidth = 1.2,
+#       arrowsize = 0.8
+#     ]
 
-    rx_node [label = 'ADHD stimulant medication fills\\nN = %s\\n', fillcolor = '#F0FDF4', color = '#15803D']
-    ob_node [label = 'ADHD-related office-based visits\\nN = %s\\n', fillcolor = '#F0FDF4', color = '#15803D']
+#     total [label = 'Total records\\nN = %s\\n']
+#     age   [label = 'Age-eligible cohort (<65 years)\\nN = %s\\n']
+#     med   [label = 'Non-Medicare, age-eligible cohort\\nN = %s\\n']
+#     adhd  [label = 'Has ADHD diagnosis (F90.x)\\nN = %s\\n']
 
-    exc_age  [label = 'Excluded: Age ≥65 years\\nN = %s\\n', fillcolor = '#FEF2F2', color = '#B91C1C']
-    exc_med  [label = 'Excluded: Medicare beneficiaries\\nN = %s\\n', fillcolor = '#FEF2F2', color = '#B91C1C']
-    exc_adhd [label = 'Excluded: No ADHD diagnosis\\nN = %s\\n', fillcolor = '#FEF2F2', color = '#B91C1C']
-    exc_rx   [label = 'No stimulant medication fills\\nN = %s\\n', fillcolor = '#FEF2F2', color = '#B91C1C']
-    exc_ob   [label = 'No ADHD-related office visits\\nN = %s\\n', fillcolor = '#FEF2F2', color = '#B91C1C']
+#     rx_node [label = 'ADHD stimulant medication fills\\nN = %s\\n', fillcolor = '#F0FDF4', color = '#15803D']
+#     ob_node [label = 'ADHD-related office-based visits\\nN = %s\\n', fillcolor = '#F0FDF4', color = '#15803D']
 
-    total -> age -> med -> adhd -> rx_node
-    adhd -> ob_node
+#     exc_age  [label = 'Excluded: Age ≥65 years\\nN = %s\\n', fillcolor = '#FEF2F2', color = '#B91C1C']
+#     exc_med  [label = 'Excluded: Medicare beneficiaries\\nN = %s\\n', fillcolor = '#FEF2F2', color = '#B91C1C']
+#     exc_adhd [label = 'Excluded: No ADHD diagnosis\\nN = %s\\n', fillcolor = '#FEF2F2', color = '#B91C1C']
+#     exc_rx   [label = 'No stimulant medication fills\\nN = %s\\n', fillcolor = '#FEF2F2', color = '#B91C1C']
+#     exc_ob   [label = 'No ADHD-related office visits\\nN = %s\\n', fillcolor = '#FEF2F2', color = '#B91C1C']
 
-    rx_node -> exc_rx [style = dashed, color = '#B91C1C']
-    ob_node -> exc_ob [style = dashed, color = '#B91C1C']
+#     total -> age -> med -> adhd -> rx_node
+#     adhd -> ob_node
 
-    age  -> exc_age  [style = dashed, color = '#B91C1C', constraint = false]
-    med  -> exc_med  [style = dashed, color = '#B91C1C', constraint = false]
-    adhd -> exc_adhd [style = dashed, color = '#B91C1C', constraint = false]
+#     rx_node -> exc_rx [style = dashed, color = '#B91C1C']
+#     ob_node -> exc_ob [style = dashed, color = '#B91C1C']
 
-    { rank = same; total; }
-    { rank = same; age;   exc_age; }
-    { rank = same; med;   exc_med; }
-    { rank = same; adhd;  exc_adhd; }
-    { rank = same; rx_node; ob_node; }
-    { rank = same; exc_rx; exc_ob; }
-  }
-  ",
-  format(n_total, big.mark = ","),
-  format(n_age, big.mark = ","),
-  format(n_medicare, big.mark = ","),
-  format(n_adhd, big.mark = ","),
-  format(n_rx, big.mark = ","),
-  format(n_ob, big.mark = ","),
-  format(n_total - n_age, big.mark = ","),
-  format(n_age - n_medicare, big.mark = ","),
-  format(n_medicare - n_adhd, big.mark = ","),
-  format(n_adhd - n_rx, big.mark = ","),
-  format(n_adhd - n_ob, big.mark = ",")
-))
+#     age  -> exc_age  [style = dashed, color = '#B91C1C', constraint = false]
+#     med  -> exc_med  [style = dashed, color = '#B91C1C', constraint = false]
+#     adhd -> exc_adhd [style = dashed, color = '#B91C1C', constraint = false]
 
-# export as png/svg
-svg <- DiagrammeRsvg::export_svg(flow_chart)
-rsvg::rsvg_svg(charToRaw(svg), "exports/inclusion_flowchart.svg")
-rsvg::rsvg_png(charToRaw(svg), "exports/inclusion_flowchart.png")
+#     { rank = same; total; }
+#     { rank = same; age;   exc_age; }
+#     { rank = same; med;   exc_med; }
+#     { rank = same; adhd;  exc_adhd; }
+#     { rank = same; rx_node; ob_node; }
+#     { rank = same; exc_rx; exc_ob; }
+#   }
+#   ",
+#   format(n_total, big.mark = ","),
+#   format(n_age, big.mark = ","),
+#   format(n_medicare, big.mark = ","),
+#   format(n_adhd, big.mark = ","),
+#   format(n_rx, big.mark = ","),
+#   format(n_ob, big.mark = ","),
+#   format(n_total - n_age, big.mark = ","),
+#   format(n_age - n_medicare, big.mark = ","),
+#   format(n_medicare - n_adhd, big.mark = ","),
+#   format(n_adhd - n_rx, big.mark = ","),
+#   format(n_adhd - n_ob, big.mark = ",")
+# ))
+
+# # export as png/svg
+# svg <- DiagrammeRsvg::export_svg(flow_chart)
+# rsvg::rsvg_svg(charToRaw(svg), "exports/inclusion_flowchart.svg")
+# rsvg::rsvg_png(charToRaw(svg), "exports/inclusion_flowchart.png")
 
 rm(list = c("ob", "rx", "step1", "step2", "step3", "step4", "flow_chart",
             "n_adhd", "n_age", "n_medicare", "n_ob", "n_rx", "n_total", "svg"))
