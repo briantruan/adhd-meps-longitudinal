@@ -126,3 +126,9 @@ rm(all_data)
 gc()
 
 years <- 2017:2023
+
+# simple setup: will run the next files in order
+source("02_clean.r")
+source("04_linkage.r")
+source("05_flowchart.r")
+source("07_table1.r")
