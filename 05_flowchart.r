@@ -32,6 +32,7 @@ merged_df <- merged_df %>%
       TRUE ~ NA_character_
     ),
     adhd_dx = if_else(!is.na(ICD10CDX) & str_starts(ICD10CDX, "F90"), 1, 0),
+    comorbid_dx = if_else(!is.na(sum_comorbidities) & sum_comorbidities > 0, 1, 0)
   )
 
 # set up survey design

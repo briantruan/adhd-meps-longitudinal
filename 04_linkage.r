@@ -6,6 +6,8 @@
 # https://github.com/HHS-AHRQ/MEPS/blob/master/R/workshop_exercises/cond_pmed_2020.R
 # -----------------------------------------------------------------------------
 
+# TODO: add comorbidities
+
 options(survey.lonely.psu = "adjust")
 options(survey.adjust.domain.lonely = TRUE)
 
@@ -13,16 +15,80 @@ link_year <- function(link, cond, rx, ob, fyc, year) {
   rx <- rx %>% 
     rename(EVNTIDX = LINKIDX)
 
-  adhd <- cond %>% 
-    filter(str_starts(ICD10CDX, "F90"))
+  adhd <- cond %>% filter(str_starts(ICD10CDX, "F90"))
 
   adhd_clnk_distinct <- adhd %>%
     inner_join(link, by = c("DUPERSID", "CONDIDX", "PANEL")) %>%
     distinct(PANEL, DUPERSID, EVNTIDX, ICD10CDX, EVENTYPE)
 
+  # top comorbidities
+  # anxiety, depression, autism, SUD, learning disorders
+  # ICD-10 codes
+  # anxiety disorders = F41
+  # MDD = F33
+  # ASD = F84
+  # SUD = F10-F19
+  # learning disorders = F81
+
+  gad <- cond %>% filter(str_starts(ICD10CDX, "F41"))
+  mdd <- cond %>% filter(str_starts(ICD10CDX, "F33"))
+  asd <- cond %>% filter(str_starts(ICD10CDX, "F84"))
+  sud <- cond %>% filter(str_starts(ICD10CDX, "F10") | 
+                         str_starts(ICD10CDX, "F11") | 
+                         str_starts(ICD10CDX, "F12") | 
+                         str_starts(ICD10CDX, "F13") | 
+                         str_starts(ICD10CDX, "F14") | 
+                         str_starts(ICD10CDX, "F15") | 
+                         str_starts(ICD10CDX, "F16") | 
+                         str_starts(ICD10CDX, "F17") | 
+                         str_starts(ICD10CDX, "F18") | 
+                         str_starts(ICD10CDX, "F19"))
+  ld  <- cond %>% filter(str_starts(ICD10CDX, "F81"))
+
+  gad_clnk_distinct <- gad %>%
+    inner_join(link, by = c("DUPERSID", "CONDIDX", "PANEL")) %>%
+    distinct(PANEL, DUPERSID, EVNTIDX, ICD10CDX, EVENTYPE) %>% 
+    mutate(gad = 1) %>% 
+    select(-ICD10CDX, -EVENTYPE)
+
+  mdd_clnk_distinct <- mdd %>%
+    inner_join(link, by = c("DUPERSID", "CONDIDX", "PANEL")) %>%
+    distinct(PANEL, DUPERSID, EVNTIDX, ICD10CDX, EVENTYPE) %>% 
+    mutate(mdd = 1) %>% 
+    select(-ICD10CDX, -EVENTYPE)
+
+  asd_clnk_distinct <- asd %>%
+    inner_join(link, by = c("DUPERSID", "CONDIDX", "PANEL")) %>%
+    distinct(PANEL, DUPERSID, EVNTIDX, ICD10CDX, EVENTYPE) %>% 
+    mutate(asd = 1) %>% 
+    select(-ICD10CDX, -EVENTYPE)
+
+  sud_clnk_distinct <- sud %>%
+    inner_join(link, by = c("DUPERSID", "CONDIDX", "PANEL")) %>%
+    distinct(PANEL, DUPERSID, EVNTIDX, ICD10CDX, EVENTYPE) %>% 
+    mutate(sud = 1) %>% 
+    select(-ICD10CDX, -EVENTYPE)
+
+  ld_clnk_distinct <- ld %>%
+    inner_join(link, by = c("DUPERSID", "CONDIDX", "PANEL")) %>%
+    distinct(PANEL, DUPERSID, EVNTIDX, ICD10CDX, EVENTYPE) %>% 
+    mutate(ld = 1) %>% 
+    select(-ICD10CDX, -EVENTYPE)
+
+  comorbidity_clnk_distinct <- gad_clnk_distinct %>% 
+    full_join(mdd_clnk_distinct, by = c("PANEL", "DUPERSID", "EVNTIDX")) %>% 
+    full_join(asd_clnk_distinct, by = c("PANEL", "DUPERSID", "EVNTIDX")) %>% 
+    full_join(sud_clnk_distinct, by = c("PANEL", "DUPERSID", "EVNTIDX")) %>% 
+    full_join(ld_clnk_distinct, by = c("PANEL", "DUPERSID", "EVNTIDX")) %>% 
+    replace_na(list(gad = 0, mdd = 0, asd = 0, sud = 0, ld = 0)) %>% 
+    mutate(sum_comorbidities = gad + mdd + asd + sud + ld)
+
   # rx-specific things
+  # + join comorbidities
   rx_adhd_merged <- adhd_clnk_distinct %>%
-    inner_join(rx, by = c("DUPERSID", "EVNTIDX", "PANEL"))
+    inner_join(rx, by = c("DUPERSID", "EVNTIDX", "PANEL")) %>% 
+    left_join(comorbidity_clnk_distinct, by = c("PANEL", "DUPERSID", "EVNTIDX")) %>% 
+    replace_na(list(gad = 0, mdd = 0, asd = 0, sud = 0, ld = 0, sum_comorbidities = 0))
 
   rx_adhd_merged <- rx_adhd_merged %>% 
     filter(
@@ -58,6 +124,13 @@ link_year <- function(link, cond, rx, ob, fyc, year) {
       drug_names = paste(sort(unique(na.omit(stimulant_class))), collapse = "; "),
       pill_qty_total = sum(RXQUANTY, na.rm = TRUE),
       pill_qty_mean = mean(RXQUANTY, na.rm = TRUE),
+      # comorbidities stuff
+      gad = max(gad, na.rm = TRUE),
+      mdd = max(mdd, na.rm = TRUE),
+      asd = max(asd, na.rm = TRUE),
+      sud = max(sud, na.rm = TRUE),
+      ld = max(ld, na.rm = TRUE),
+      sum_comorbidities = max(sum_comorbidities, na.rm = TRUE),
       .by = DUPERSID
     ) %>%
     mutate(

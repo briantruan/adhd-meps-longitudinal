@@ -75,7 +75,7 @@ total_rx_ob_exp_long_plot <- ggplot(total_rx_ob_exp_long,
 # ggsave("exports/total_rx_ob_exp_long_plot.svg", plot = total_rx_ob_exp_long_plot, width = 9, height = 5)
 
 
-# telehealth visit trends-------------------------------------------------
+# telehealth visit trends ------------------------------------------------
 
 total_ob_exp_by_year <- svyby(
   ~ob_totalexp,
@@ -207,7 +207,7 @@ total_ob_breakdown_exp_long_plot <- ggplot(
 rm(mental_visit_exp_by_year, telehealth_mental_visit_exp_by_year, teleheatlh_exp_by_year, 
   total_ob_breakdown_exp, total_ob_breakdown_exp_long, total_ob_breakdown_exp_long_plot, total_ob_exp_by_year)
 
-# visit count trends------------------------------------------------------
+# visit count trends -----------------------------------------------------
 
 total_ob_visits_by_year <- svyby(
   ~ob_visits,
@@ -334,3 +334,5 @@ total_ob_breakdown_visits_long_plot <- ggplot(
 # # skip if not needed
 # ggsave("exports/total_ob_breakdown_visits_long_plot.png", plot = total_ob_breakdown_visits_long_plot, width = 9, height = 5)
 # ggsave("exports/total_ob_breakdown_visits_long_plot.svg", plot = total_ob_breakdown_visits_long_plot, width = 9, height = 5)
+
+# stimulant class percentage share ---------------------------------------

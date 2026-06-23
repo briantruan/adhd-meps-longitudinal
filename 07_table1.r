@@ -17,7 +17,17 @@ merged_df <- merged_df %>%
       TRUE ~ insurance
     ),
     insurance = factor(insurance, levels = c("Private only", "Medicaid", "Other public", "Uninsured")),
-    AGEDIAG = if_else(AGE53X >= 0, AGE53X, NA_real_)
+    AGEDIAG = if_else(AGE53X >= 0, AGE53X, NA_real_),
+    drug_classes = case_when(
+      tolower(drug_names) == "amphetamines" ~ "Amphetamines",
+      tolower(drug_names) == "methylphenidates" ~ "Methylphenidate",
+      tolower(drug_names) == "lisdexamfetamine" ~ "Lisdexamfetamine",
+      tolower(drug_names) == "amphetamines; lisdexamfetamine" ~ "Multiple stimulants",
+      tolower(drug_names) == "amphetamines; lisdexamfetamine; methylphenidates" ~ "Multiple stimulants",
+      tolower(drug_names) == "amphetamines; methylphenidates" ~ "Multiple stimulants",
+      tolower(drug_names) == "lisdexamfetamine; methylphenidates" ~ "Multiple stimulants",
+      TRUE ~ NA_character_
+    )
   )
 
 # remake design vars
