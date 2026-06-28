@@ -39,6 +39,9 @@ design <- svydesign(
   nest = TRUE
 )
 
+preanalytic_design <- subset(design, subset = AGE53X < 65 &
+                                           medicare == "No Medicare")
+
 analytic_design <- subset(design, subset = AGE53X < 65 &
                                            medicare == "No Medicare" &
                                            adhd_dx == 1)
@@ -74,3 +77,6 @@ analytic_design <- subset(design, subset = AGE53X < 65 &
 
 # gtsave(table1, "exports/table1.html")
 # gtsave(table1, "exports/table1.docx")
+
+# get the weighted total number of ADHD diagnoses
+svytotal(~adhd_dx, analytic_design)

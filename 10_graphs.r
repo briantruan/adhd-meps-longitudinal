@@ -335,4 +335,130 @@ total_ob_breakdown_visits_long_plot <- ggplot(
 # ggsave("exports/total_ob_breakdown_visits_long_plot.png", plot = total_ob_breakdown_visits_long_plot, width = 9, height = 5)
 # ggsave("exports/total_ob_breakdown_visits_long_plot.svg", plot = total_ob_breakdown_visits_long_plot, width = 9, height = 5)
 
-# stimulant class percentage share ---------------------------------------
+# stimulant class percentage share - see 08_table2_rx.r ------------------
+# rx expenditures: OOP share ---------------------------------------------
+
+oop_rx_exp_by_year <- svyby(
+  ~oop_share,
+  ~year,
+  analytic_design,
+  FUN = svymean,
+  na.rm = TRUE,
+  keep.var = TRUE
+)
+
+oop_rx_exp <- as_tibble(oop_rx_exp_by_year) %>%
+  rename(
+    var1 = oop_share,
+    var1_se = se
+  ) %>%
+  select(year, var1, var1_se)
+
+oop_rx_exp_long <- bind_rows(
+  oop_rx_exp %>%
+    transmute(
+      year,
+      series = "Total",
+      oop_share = var1,
+      se = var1_se
+    )) %>%
+  mutate(
+    lower = oop_share - 1.96 * se,
+    upper = oop_share + 1.96 * se
+  )
+
+oop_rx_exp_long_plot <- ggplot(oop_rx_exp_long, 
+  aes(x = year, y = oop_share)) +
+  geom_line(color = "#2C7FB8", linewidth = 1) +
+  geom_point(color = "#2C7FB8", size = 2) +
+  labs(x = "Year", y = "Out-of-pocket share") +
+  scale_x_continuous(breaks = 2017:2023) +
+  theme_minimal()
+
+# skip if not needed
+ggsave("exports/oop_rx_exp_long_plot.png", plot = oop_rx_exp_long_plot, width = 9, height = 5)
+ggsave("exports/oop_rx_exp_long_plot.svg", plot = oop_rx_exp_long_plot, width = 9, height = 5)
+
+# rx expenditures: mean days supplied ------------------------------------
+
+mean_days_supp_by_year <- svyby(
+  ~med_days_supp,
+  ~year,
+  analytic_design,
+  FUN = svymean,
+  na.rm = TRUE,
+  keep.var = TRUE
+)
+
+mean_days_supp <- as_tibble(mean_days_supp_by_year) %>%
+  rename(
+    var1 = med_days_supp,
+    var1_se = se
+  ) %>%
+  select(year, var1, var1_se)
+
+mean_days_supp_long <- bind_rows(
+  mean_days_supp %>%
+    transmute(
+      year,
+      series = "Total",
+      mean_days_supp = var1,
+      se = var1_se
+    )) %>%
+  mutate(
+    lower = mean_days_supp - 1.96 * se,
+    upper = mean_days_supp + 1.96 * se
+  )
+
+mean_days_supp_long_plot <- ggplot(mean_days_supp_long, 
+  aes(x = year, y = mean_days_supp)) +
+  geom_line(color = "#2C7FB8", linewidth = 1) +
+  geom_point(color = "#2C7FB8", size = 2) +
+  labs(x = "Year", y = "Mean days supplied") +
+  scale_x_continuous(breaks = 2017:2023) +
+  theme_minimal()
+
+ggsave("exports/mean_days_supp_long_plot.png", plot = mean_days_supp_long_plot, width = 9, height = 5)
+ggsave("exports/mean_days_supp_long_plot.svg", plot = mean_days_supp_long_plot, width = 9, height = 5)
+
+# rx expenditures: expenditures in general -------------------------------
+
+expenditures_by_year <- svyby(
+  ~med_total_spend,
+  ~year,
+  analytic_design,
+  FUN = svymean,
+  na.rm = TRUE,
+  keep.var = TRUE
+)
+
+expenditures <- as_tibble(expenditures_by_year) %>%
+  rename(
+    var1 = med_total_spend,
+    var1_se = se
+  ) %>%
+  select(year, var1, var1_se)
+
+expenditures_long <- bind_rows(
+  expenditures %>%
+    transmute(
+      year,
+      series = "Total",
+      med_total_spend = var1,
+      se = var1_se
+    )) %>%
+  mutate(
+    lower = med_total_spend - 1.96 * se,
+    upper = med_total_spend + 1.96 * se
+  )
+
+expenditures_long_plot <- ggplot(expenditures_long, 
+  aes(x = year, y = med_total_spend)) +
+  geom_line(color = "#2C7FB8", linewidth = 1) +
+  geom_point(color = "#2C7FB8", size = 2) +
+  labs(x = "Year", y = "Mean expenditures (2023 USD)") +
+  scale_x_continuous(breaks = 2017:2023) +
+  theme_minimal()
+
+ggsave("exports/expenditures_long_plot.png", plot = expenditures_long_plot, width = 9, height = 5)
+ggsave("exports/expenditures_long_plot.svg", plot = expenditures_long_plot, width = 9, height = 5)
