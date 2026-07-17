@@ -33,8 +33,8 @@ table2 <- tbl_svysummary(
   add_p() %>% 
   as_gt()
 
-gtsave(table2, "exports/table2.html")
-gtsave(table2, "exports/table2.docx")
+# gtsave(table2, "exports/table2.html")
+# gtsave(table2, "exports/table2.docx")
 
 # table 2a will list counts of specific stimulant classes
 
@@ -50,8 +50,8 @@ table2a <- tbl_svysummary(
   add_p() %>% 
   as_gt()
 
-gtsave(table2a, "exports/table2a.html")
-gtsave(table2a, "exports/table2a.docx")
+# gtsave(table2a, "exports/table2a.html")
+# gtsave(table2a, "exports/table2a.docx")
 
 # graph table2a
 drug_class_plot_data <- svytable(~drug_classes + year, analytic_design) %>% 
@@ -69,7 +69,7 @@ stimulant_classes_plot <- ggplot(drug_class_plot_data, aes(x = year,
   coord_cartesian(ylim = c(0, NA)) +
   theme_minimal()
 
-ggsave("exports/stimulant_classes_plot.png", plot = stimulant_classes_plot, 
-                                             width = 9, height = 5)
-ggsave("exports/stimulant_classes_plot.svg", plot = stimulant_classes_plot, 
-                                             width = 9, height = 5)
+# ggsave("exports/stimulant_classes_plot.png", plot = stimulant_classes_plot, 
+#                                              width = 9, height = 5)
+# ggsave("exports/stimulant_classes_plot.svg", plot = stimulant_classes_plot, 
+#                                              width = 9, height = 5)

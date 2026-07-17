@@ -3,6 +3,29 @@
 # already made prevalence graphs; see 06_prevalence.r
 # also includes % ADHD-diagnosed with medication fills
 
+
+# prevalence -------------------------------------------------------------
+
+# prevalence of all, age_group == "<18", and age_group == "18-64" on the same plot
+
+prev_age_subset_by_year <- svyby(
+  ~adhd_dx,
+  ~year + age_group,
+  preanalytic_design,
+  FUN = svymean,
+  na.rm = TRUE,
+  keep.var = TRUE
+)
+
+ggplot(prev_age_subset_by_year, aes(x = year, y = adhd_dx, color = age_group, group = age_group)) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 2) +
+  geom_errorbar(aes(ymin = adhd_dx - se, ymax = adhd_dx + se), width = 0.15) +
+  scale_x_continuous(breaks = prev_age_subset_by_year$year) +
+  labs(x = "Year", y = "Prevalence of ADHD diagnosis", color = "Age group") +
+  theme_minimal()
+
+
 # total_rx_ob_exp --------------------------------------------------------
 
 total_rx_exp_by_year <- svyby(
